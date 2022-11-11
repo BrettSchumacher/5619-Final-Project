@@ -37,7 +37,7 @@ public class WheelController : Grabbable
 
             float xRot = transform.localEulerAngles.x;
             float yRot = transform.localEulerAngles.y;
-            float zRot = startZRot + angle;
+            float zRot = (startZRot + angle) % 360f;
             transform.localEulerAngles = new Vector3(xRot, yRot, zRot);
 
             angularVel = (zRot - prevZRot) / Time.deltaTime;
@@ -47,7 +47,7 @@ public class WheelController : Grabbable
         {
             float xRot = transform.localEulerAngles.x;
             float yRot = transform.localEulerAngles.y;
-            float zRot = transform.localEulerAngles.z + angularVel * Time.deltaTime;
+            float zRot = (transform.localEulerAngles.z + angularVel * Time.deltaTime) % 360f;
             transform.localEulerAngles = new Vector3(xRot, yRot, zRot);
 
             if (angularVel < 0f)
@@ -61,10 +61,7 @@ public class WheelController : Grabbable
 
             if (Mathf.Abs(angularVel) < Mathf.Abs(angularVelThresh))
             {
-                angularVel = 0f;
-                lockInTimer = lockInTime;
-                startZRot = zRot;
-                goalZRot = CurrentValue() * 36f;
+                SetLockInParams();
             }
         }
         else if (lockInTimer > 0f)
@@ -84,6 +81,28 @@ public class WheelController : Grabbable
         }
     }
 
+    void SetLockInParams()
+    {
+        float zRot = transform.localEulerAngles.z;
+        angularVel = 0f;
+        lockInTimer = lockInTime;
+        startZRot = zRot;
+        goalZRot = ((10 - CurrentValue()) % 10) * 36f;
+
+        if (Mathf.Abs(startZRot - goalZRot) > 180f)
+        {
+            while (goalZRot - 180f > startZRot)
+            {
+                goalZRot -= 360f;
+            }
+
+            while (startZRot - 180f > goalZRot)
+            {
+                startZRot -= 360f;
+            }
+        }
+    }
+
     public override void OnGrab(Transform grabber)
     {
         holder = grabber;
@@ -98,6 +117,11 @@ public class WheelController : Grabbable
     {
         if (holder != grabber) return;
         holder = null;
+
+        if (Mathf.Abs(angularVel) < angularVelThresh)
+        {
+            SetLockInParams();
+        }
     }
 
     public bool LockedIn()
@@ -107,12 +131,12 @@ public class WheelController : Grabbable
 
     public int CurrentValue()
     {
-        float zRot = transform.localEulerAngles.z;
+        float zRot = transform.localEulerAngles.z % 360f;
         zRot += 360f / 20f;
         while (zRot < 0f)
         {
             zRot += 360f;
         }
-        return Mathf.FloorToInt(zRot / 10f);
+        return (10 - Mathf.FloorToInt(zRot / 36f)) % 10;
     }
 }

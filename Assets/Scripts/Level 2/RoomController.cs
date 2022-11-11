@@ -12,11 +12,17 @@ public class RoomController : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        if (solved) return;
-
         foreach (PuzzleElement piece in pieces)
         {
-            if (!piece.IsCorrect()) return;
+            if (!piece.IsCorrect())
+            {
+                if (solved)
+                {
+                    solved = false;
+                    door.CloseDoor();
+                }
+                return;
+            }
         }
 
         solved = true;

@@ -84,7 +84,7 @@ Material:
     m_Ints: []
     m_Floats:
     - _BumpScale: 1
-    - _Color_Sensitivity: 1
+    - _Color_Sensitivity: 25
     - _Cutoff: 0.5
     - _Depth_Sensitivity: 50
     - _DetailNormalMapScale: 1
