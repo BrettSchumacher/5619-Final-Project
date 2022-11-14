@@ -20,11 +20,17 @@ public class PlayerGrab : MonoBehaviour
         rightHanded = OVRInput.GetDominantHand() == OVRInput.Handedness.RightHanded;
     }
 
+    bool mainWasDown = false;
+    bool altWasDown = false;
+
     // Update is called once per frame
     void Update()
     {
-        if (OVRInput.GetDown(OVRInput.Button.PrimaryHandTrigger) || OVRInput.GetDown(OVRInput.Button.PrimaryIndexTrigger))
+        OVRInput.Update();
+        if (!mainWasDown && (OVRInput.Get(OVRInput.Button.PrimaryHandTrigger) || OVRInput.Get(OVRInput.Button.PrimaryIndexTrigger)))
         {
+            print("down main hand");
+            mainWasDown = true;
             Grabbable temp = TryGrab(rightHanded ? rightHand : leftHand);
             if (rightHanded)
             {
@@ -36,8 +42,10 @@ public class PlayerGrab : MonoBehaviour
             }
         }
         
-        if (OVRInput.GetDown(OVRInput.Button.SecondaryHandTrigger) || OVRInput.GetDown(OVRInput.Button.SecondaryIndexTrigger))
+        if (!altWasDown && (OVRInput.Get(OVRInput.Button.SecondaryHandTrigger) || OVRInput.Get(OVRInput.Button.SecondaryIndexTrigger)))
         {
+            print("doen alt hand");
+            altWasDown = true;
             Grabbable temp = TryGrab(rightHanded ? leftHand : rightHand);
             if (rightHanded)
             {
@@ -49,8 +57,10 @@ public class PlayerGrab : MonoBehaviour
             }
         }
 
-        if (OVRInput.GetUp(OVRInput.Button.PrimaryHandTrigger) || OVRInput.GetUp(OVRInput.Button.PrimaryIndexTrigger))
+        if (mainWasDown && !(OVRInput.Get(OVRInput.Button.PrimaryHandTrigger) || !OVRInput.Get(OVRInput.Button.PrimaryIndexTrigger)))
         {
+            print("up main hand");
+            mainWasDown = false;
             if (rightHanded && rightHandObj)
             {
                 rightHandObj.OnRelease(rightHand);
@@ -63,8 +73,10 @@ public class PlayerGrab : MonoBehaviour
             }    
         }
 
-        if (OVRInput.GetUp(OVRInput.Button.SecondaryHandTrigger) || OVRInput.GetUp(OVRInput.Button.SecondaryHandTrigger))
+        if (altWasDown && !(OVRInput.Get(OVRInput.Button.SecondaryHandTrigger) || OVRInput.Get(OVRInput.Button.SecondaryHandTrigger)))
         {
+            print("up alt hand");
+            altWasDown = false;
             if (rightHanded && leftHandObj)
             {
                 leftHandObj.OnRelease(leftHand);
@@ -87,6 +99,7 @@ public class PlayerGrab : MonoBehaviour
 
         foreach (Collider col in cols)
         {
+            print("grabbing " + col.name);
             Grabbable tempGrab = col.GetComponent<Grabbable>();
             if (!tempGrab) continue;
 

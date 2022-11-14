@@ -9,6 +9,8 @@ public class WheelController : Grabbable
     public float lockInTime;
     public AnimationCurve lockInCurve;
 
+    public float startMomentum = 0.0f;
+
     Transform holder;
     Vector3 holderVec;
     Vector3 planeNormal;
@@ -24,6 +26,16 @@ public class WheelController : Grabbable
     void Start()
     {
         planeNormal = transform.TransformVector(Vector3.forward);
+
+        if (Mathf.Abs(startMomentum) > 0.0f)
+        {
+            angularVel = startMomentum;
+            lockedIn = false;
+            if (Mathf.Abs(startMomentum) < angularVelThresh)
+            {
+                SetLockInParams();
+            }
+        }
     }
 
     // Update is called once per frame

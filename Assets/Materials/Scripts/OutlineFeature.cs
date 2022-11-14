@@ -10,6 +10,7 @@ public class OutlineFeature : ScriptableRendererFeature
         private RenderTargetHandle destination { get; set; }
         public Material outlineMaterial = null;
         RenderTargetHandle temporaryColorTexture;
+        RenderTargetIdentifier m_CameraOutlineTarget;
 
         public void Setup(RenderTargetIdentifier source, RenderTargetHandle destination)
         {
@@ -20,6 +21,7 @@ public class OutlineFeature : ScriptableRendererFeature
         public OutlinePass(Material outlineMaterial)
         {
             this.outlineMaterial = outlineMaterial;
+            renderPassEvent = RenderPassEvent.BeforeRenderingPostProcessing;
         }
 
 
@@ -34,27 +36,43 @@ public class OutlineFeature : ScriptableRendererFeature
 
         }
 
+        public override void OnCameraSetup(CommandBuffer cmd, ref RenderingData renderingData)
+        {
+            ConfigureTarget(new RenderTargetIdentifier(m_CameraOutlineTarget, 0, CubemapFace.Unknown, -1));
+        }
+
+        public void SetTarget(RenderTargetIdentifier outlineHandle)
+        {
+            m_CameraOutlineTarget = outlineHandle;
+        }
+
         // Here you can implement the rendering logic.
         // Use <c>ScriptableRenderContext</c> to issue drawing commands or execute command buffers
         // https://docs.unity3d.com/ScriptReference/Rendering.ScriptableRenderContext.html
         // You don't have to call ScriptableRenderContext.submit, the render pipeline will call it at specific points in the pipeline.
         public override void Execute(ScriptableRenderContext context, ref RenderingData renderingData)
         {
+            var camera = renderingData.cameraData.camera;
+            if (camera.cameraType != CameraType.Game) return;
+
             CommandBuffer cmd = CommandBufferPool.Get("_OutlinePass");
 
             RenderTextureDescriptor opaqueDescriptor = renderingData.cameraData.cameraTargetDescriptor;
             opaqueDescriptor.depthBufferBits = 0;
 
-            if (destination == RenderTargetHandle.CameraTarget)
+            if (outlineMaterial != null)
             {
-                cmd.GetTemporaryRT(temporaryColorTexture.id, opaqueDescriptor, FilterMode.Point);
-                Blit(cmd, source, temporaryColorTexture.Identifier(), outlineMaterial, 0);
-                Blit(cmd, temporaryColorTexture.Identifier(), source);
+                cmd.SetRenderTarget(new RenderTargetIdentifier(m_CameraOutlineTarget, 0, CubemapFace.Unknown, -1));
+                cmd.DrawMesh(RenderingUtils.fullscreenMesh, Matrix4x4.identity, outlineMaterial);
+                // cmd.GetTemporaryRT(temporaryColorTexture.id, opaqueDescriptor, FilterMode.Point);
+                // Blit(cmd, source, temporaryColorTexture.Identifier(), outlineMaterial, 0);
+                // Blit(cmd, temporaryColorTexture.Identifier(), source);
 
             }
-            else Blit(cmd, source, destination.Identifier(), outlineMaterial, 0);
+            // else Blit(cmd, source, destination.Identifier(), outlineMaterial, 0);
 
             context.ExecuteCommandBuffer(cmd);
+            cmd.Clear();
             CommandBufferPool.Release(cmd);
         }
 
@@ -62,8 +80,8 @@ public class OutlineFeature : ScriptableRendererFeature
         public override void FrameCleanup(CommandBuffer cmd)
         {
 
-            if (destination == RenderTargetHandle.CameraTarget)
-                cmd.ReleaseTemporaryRT(temporaryColorTexture.id);
+            // if (destination == RenderTargetHandle.CameraTarget)
+            //     cmd.ReleaseTemporaryRT(temporaryColorTexture.id);
         }
     }
 
@@ -75,13 +93,13 @@ public class OutlineFeature : ScriptableRendererFeature
 
     public OutlineSettings settings = new OutlineSettings();
     OutlinePass outlinePass;
-    RenderTargetHandle outlineTexture;
+    // RenderTargetHandle outlineTexture;
 
     public override void Create()
     {
         outlinePass = new OutlinePass(settings.outlineMaterial);
-        outlinePass.renderPassEvent = RenderPassEvent.AfterRenderingTransparents;
-        outlineTexture.Init("_OutlineTexture");
+        // outlinePass.renderPassEvent = RenderPassEvent.AfterRenderingTransparents;
+        // outlineTexture.Init("_OutlineTexture");
     }
 
     // Here you can inject one or multiple render passes in the renderer.
@@ -93,7 +111,8 @@ public class OutlineFeature : ScriptableRendererFeature
             Debug.LogWarningFormat("Missing Outline Material");
             return;
         }
-        outlinePass.Setup(renderer.cameraColorTarget, RenderTargetHandle.CameraTarget);
+        outlinePass.SetTarget(renderer.cameraColorTarget);
+        // outlinePass.Setup(renderer.cameraColorTarget, RenderTargetHandle.CameraTarget);
         renderer.EnqueuePass(outlinePass);
     }
 }
