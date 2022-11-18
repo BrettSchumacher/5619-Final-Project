@@ -5,6 +5,8 @@ using UnityEngine;
 public class WalkingNav : MonoBehaviour
 {
     public GameObject RigRef;
+    public float speed = 1f;
+
     Vector3 rigposition;
     Vector3 rigrotation;
     Vector3 newposition;
@@ -52,8 +54,8 @@ public class WalkingNav : MonoBehaviour
         if (!collided)
         {
             newposition = new Vector3(newx, rigposition.y, newz);
-            RigRef.transform.position += RigRef.transform.forward * (thumbstickpos.y * reductionfactor);
-            RigRef.transform.position += RigRef.transform.right * (thumbstickpos.x * reductionfactor);
+            RigRef.transform.position += RigRef.transform.forward * (thumbstickpos.y * speed * Time.deltaTime);
+            RigRef.transform.position += RigRef.transform.right * (thumbstickpos.x * speed * Time.deltaTime);
         }
 
         //Debug.Log(OVRInput.Get(OVRInput.Axis2D.SecondaryThumbstick));

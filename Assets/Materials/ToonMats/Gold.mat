@@ -20,7 +20,7 @@ Material:
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_Name: Wheelmat
+  m_Name: Gold
   m_Shader: {fileID: -6465566751694194690, guid: bbc70fe09325b4e47b3227c452bd34c4, type: 3}
   m_ValidKeywords: []
   m_InvalidKeywords: []
@@ -103,7 +103,7 @@ Material:
     - _DstBlend: 0
     - _EnvironmentReflections: 1
     - _GlossMapScale: 0
-    - _Glossiness: 7.63
+    - _Glossiness: 54.8
     - _GlossyReflections: 0
     - _K_D: 0.8
     - _Metallic: 0
@@ -123,8 +123,8 @@ Material:
     m_Colors:
     - _Ambient: {r: 0.5377358, g: 0.5377358, b: 0.5377358, a: 1}
     - _BaseColor: {r: 1, g: 1, b: 1, a: 1}
-    - _Color: {r: 0.4056604, g: 0.24773726, b: 0.18905303, a: 1}
+    - _Color: {r: 0.6037736, g: 0.41078255, b: 0.15037379, a: 1}
     - _EmissionColor: {r: 0, g: 0, b: 0, a: 1}
     - _SpecColor: {r: 0.2, g: 0.2, b: 0.2, a: 1}
-    - _Specular: {r: 0, g: 0, b: 0, a: 1}
+    - _Specular: {r: 1, g: 1, b: 1, a: 1}
   m_BuildTextureStacks: []

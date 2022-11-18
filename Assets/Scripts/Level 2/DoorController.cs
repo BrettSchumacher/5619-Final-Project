@@ -46,7 +46,7 @@ public class DoorController : MonoBehaviour
 
         if (!opening && !closing) return;
 
-        timer += opening ?  Time.deltaTime : -Time.deltaTime;
+        timer += opening ?  Time.deltaTime : -5f * Time.deltaTime;
         float t = openingCurve.Evaluate(timer / openingTime);
 
         for (int i = 0; i < panels.Count; i++)

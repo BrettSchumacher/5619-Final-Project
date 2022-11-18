@@ -46,13 +46,14 @@ public class RoomController : MonoBehaviour
         }
     }
 
-    private void OnTriggerEnter(Collider other)
+    private void OnCollisionEnter(Collision collision)
     {
-        if (other.CompareTag("Player"))
+        if (collision.collider.CompareTag("Player"))
         {
             entrance_door.CloseDoor();
             puzzleStarted = true;
             if (previousRoom) previousRoom.puzzleEnded = true;
+            GetComponent<Collider>().enabled = false;
         }
     }
 }
