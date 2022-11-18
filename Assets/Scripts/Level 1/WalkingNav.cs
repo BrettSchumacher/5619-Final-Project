@@ -13,6 +13,8 @@ public class WalkingNav : MonoBehaviour
     Vector3 newrotation;
     float reductionfactor;
     bool collided;
+    bool upAngle;
+    bool downAngle;
 
     // Start is called before the first frame update
     void Start()
@@ -23,7 +25,11 @@ public class WalkingNav : MonoBehaviour
         newrotation = new Vector3(0, 0, 0);
         reductionfactor = 0.1f;
         collided = false;
+        upAngle = false;
+        downAngle = false;
     }
+
+
 
     void OnTriggerEnter(Collider collider)
     {
@@ -33,6 +39,20 @@ public class WalkingNav : MonoBehaviour
             collided = true;
         }
         
+        if (collider.gameObject.name == "blue wall nav trigger")
+        {
+            upAngle = true;
+        }
+
+        if (collider.gameObject.name == "red wall nav trigger")
+        {
+            downAngle = true;
+        }
+
+        if (collider.gameObject.name == "blue wall nav trigger (1)")
+        {
+            upAngle = false;
+        }
     }
 
     void OnTriggerExit(Collider collider)
@@ -63,7 +83,20 @@ public class WalkingNav : MonoBehaviour
         rigrotation = RigRef.transform.eulerAngles;
         float newry = rigrotation.y + (thumbstickrot.x * 2);
 
-        newrotation = new Vector3(rigrotation.x, newry, rigrotation.z);
+        if (upAngle)
+        {
+            newrotation = new Vector3(-37.0f, newry, rigrotation.z);
+
+        } else if (downAngle) {
+
+            newrotation = new Vector3(50.0f, newry, rigrotation.z);
+
+        } else {
+
+            newrotation = new Vector3(0.0f, newry, rigrotation.z);
+
+        }
+        
         //RigRef.transform.rotation = Quaternion.Euler(newrx, RigRef.transform.rotation.y, newrz);
         RigRef.transform.eulerAngles = newrotation;
 
