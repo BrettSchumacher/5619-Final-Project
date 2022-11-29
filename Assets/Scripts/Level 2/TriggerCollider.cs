@@ -10,13 +10,14 @@ public class TriggerCollider : MonoBehaviour
     public UnityEvent onTrigger;
     public string triggerTag;
     public string triggerName;
+    public bool disableOnCollision = true;
 
     private void OnCollisionEnter(Collision collision)
     {
         print("Collision with " + collision.collider.name + ", tag: " + collision.collider.tag);
         if (collision.collider.CompareTag(triggerTag) || collision.collider.name == triggerName)
         {
-            GetComponent<Collider>().enabled = false;
+            if (disableOnCollision) GetComponent<Collider>().enabled = false;
             onTrigger?.Invoke();
         }
     }
